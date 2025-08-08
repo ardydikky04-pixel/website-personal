@@ -1,649 +1,1046 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puskesmas Ohoitahit - Pelayanan Kesehatan Terpercaya</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <title>Sistem Manajemen Data Pasien - Puskesmas Ohoitahit</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
     <style>
-        body { font-family: 'Poppins', sans-serif; }
-        .bg-primary { background-color: #14b8a6; }
-        .text-primary { color: #14b8a6; }
-        .border-primary { border-color: #14b8a6; }
-        .hover-primary:hover { background-color: #0f766e; }
-        .dark .bg-white { background-color: #1f2937; }
-        .dark .text-gray-900 { color: #f9fafb; }
-        .dark .text-gray-600 { color: #d1d5db; }
-        .dark .bg-gray-50 { background-color: #374151; }
-        .dark .border-gray-200 { border-color: #4b5563; }
+        /* Custom CSS untuk tema kesehatan */
+        :root {
+            --primary-blue: #2563eb;
+            --secondary-blue: #1e40af;
+            --success-green: #059669;
+            --light-green: #10b981;
+            --bg-light: #f8fafc;
+            --text-dark: #1f2937;
+            --border-color: #e5e7eb;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, #e0f2fe 50%, #f0fdf4 100%);
+            min-height: 100vh;
+        }
+
+        /* Header Styling */
+        .main-header {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border-bottom: 3px solid var(--primary-blue);
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .puskesmas-logo {
+            background: linear-gradient(135deg, var(--success-green), var(--light-green));
+        }
+
+        .bpjs-logo {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+        }
+
+        .main-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--success-green), var(--primary-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin: 0;
+        }
+
+        /* Navigation Styling */
+        .navbar-custom {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            box-shadow: 0 2px 10px rgba(37, 99, 235, 0.3);
+        }
+
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 500;
+            padding: 10px 20px !important;
+            border-radius: 8px;
+            margin: 0 5px;
+            transition: all 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Card Styling */
+        .card-custom {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Button Styling */
+        .btn-primary-custom {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            border: none;
+            border-radius: 10px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-success-custom {
+            background: linear-gradient(135deg, var(--success-green), var(--light-green));
+            border: none;
+            border-radius: 10px;
+            padding: 10px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-success-custom:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4);
+        }
+
+        /* Form Styling */
+        .form-control-custom {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control-custom:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            transform: translateY(-1px);
+        }
+
+        /* Table Styling */
+        .table-custom {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-custom thead {
+            background: linear-gradient(135deg, var(--primary-blue), var(--secondary-blue));
+            color: white;
+        }
+
+        .table-custom tbody tr:hover {
+            background-color: rgba(37, 99, 235, 0.05);
+        }
+
+        /* Dashboard Stats */
+        .stat-card {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border-left: 5px solid var(--primary-blue);
+        }
+
+        .stat-card.success {
+            border-left-color: var(--success-green);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+        }
+
+        .stat-number.success {
+            color: var(--success-green);
+        }
+
+        /* Footer Styling */
+        .footer-custom {
+            background: linear-gradient(135deg, var(--text-dark), #374151);
+            color: white;
+            margin-top: 50px;
+        }
+
+        /* Login Page Styling */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--primary-blue), var(--success-green));
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 1.8rem;
+            }
+            
+            .logo-section {
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+            
+            .table-responsive {
+                border-radius: 15px;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Loading Spinner */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
-<body class="transition-colors duration-300">
-    <!-- Header -->
-    <header class="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50 transition-colors duration-300">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <div class="flex items-center space-x-3">
-                    <div class="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
-                        <i class="fas fa-hospital text-white text-xl"></i>
-                    </div>
-                    <div>
-                        <h1 class="text-xl font-bold text-gray-900 dark:text-white">Puskesmas Ohoitahit</h1>
-                        <p class="text-sm text-gray-600 dark:text-gray-300">Melayani dengan Hati</p>
-                    </div>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card fade-in">
+            <div class="text-center mb-4">
+                <div class="logo-icon puskesmas-logo mx-auto mb-3">
+                    <i class="fas fa-hospital"></i>
                 </div>
-                
-                <nav class="hidden md:flex space-x-8">
-                    <a href="#beranda" class="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Beranda</a>
-                    <a href="#layanan" class="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Layanan</a>
-                    <a href="#jadwal" class="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Jadwal Dokter</a>
-                    <a href="#daftar" class="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Daftar Online</a>
-                    <a href="#kontak" class="text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Kontak</a>
-                </nav>
-
-                <div class="flex items-center space-x-4">
-                    <button id="darkModeToggle" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
-                        <i class="fas fa-moon dark:hidden"></i>
-                        <i class="fas fa-sun hidden dark:inline"></i>
-                    </button>
-                    <button id="mobileMenuToggle" class="md:hidden p-2 text-gray-600 dark:text-gray-300">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
+                <h2 class="mb-2" style="color: var(--primary-blue);">Puskesmas Ohoitahit</h2>
+                <p class="text-muted">Sistem Manajemen Data Pasien</p>
             </div>
             
-            <!-- Mobile Menu -->
-            <div id="mobileMenu" class="hidden md:hidden pb-4">
-                <nav class="flex flex-col space-y-2">
-                    <a href="#beranda" class="py-2 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Beranda</a>
-                    <a href="#layanan" class="py-2 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Layanan</a>
-                    <a href="#jadwal" class="py-2 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Jadwal Dokter</a>
-                    <a href="#daftar" class="py-2 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Daftar Online</a>
-                    <a href="#kontak" class="py-2 text-gray-700 dark:text-gray-300 hover:text-primary transition-colors">Kontak</a>
-                </nav>
-            </div>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section id="beranda" class="bg-gradient-to-r from-teal-500 to-cyan-600 text-white py-20">
-        <div class="container mx-auto px-4 text-center">
-            <div data-aos="fade-up">
-                <h2 class="text-4xl md:text-6xl font-bold mb-6">Selamat Datang di<br>Puskesmas Ohoitahit</h2>
-                <p class="text-xl md:text-2xl mb-8 opacity-90">Memberikan pelayanan kesehatan terbaik untuk masyarakat dengan fasilitas modern dan tenaga medis profesional</p>
-                <a href="#daftar" class="inline-block bg-white text-teal-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-gray-100 transition-colors shadow-lg">
-                    <i class="fas fa-calendar-plus mr-2"></i>Daftar Sekarang
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Misi Section -->
-    <section class="py-16 bg-white dark:bg-gray-800 transition-colors duration-300">
-        <div class="container mx-auto px-4">
-            <div class="max-w-4xl mx-auto text-center" data-aos="fade-up">
-                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-6">Sambutan Kepala Puskesmas</h3>
-                <p class="text-lg text-gray-600 dark:text-gray-300 leading-relaxed">
-                    Puskesmas Ohoitahit berkomitmen untuk memberikan pelayanan kesehatan yang berkualitas, terjangkau, dan mudah diakses oleh seluruh masyarakat. Dengan didukung oleh tenaga medis yang kompeten dan fasilitas yang memadai, kami siap melayani Anda dengan sepenuh hati.
-                </p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Layanan Section -->
-    <section id="layanan" class="py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Layanan Kami</h3>
-                <p class="text-lg text-gray-600 dark:text-gray-300">Berbagai layanan kesehatan untuk memenuhi kebutuhan Anda</p>
-            </div>
+            <form id="loginForm">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control form-control-custom" id="username" value="admin" required>
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control form-control-custom" id="password" value="1234" required>
+                </div>
+                <button type="submit" class="btn btn-primary-custom w-100">
+                    <i class="fas fa-sign-in-alt me-2"></i>Login
+                </button>
+            </form>
             
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow" data-aos="fade-up" data-aos-delay="100">
-                    <div class="w-16 h-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-user-md text-2xl text-teal-600"></i>
-                    </div>
-                    <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Poli Umum</h4>
-                    <p class="text-gray-600 dark:text-gray-300">Pemeriksaan kesehatan umum dan konsultasi medis dengan dokter berpengalaman</p>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow" data-aos="fade-up" data-aos-delay="200">
-                    <div class="w-16 h-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-tooth text-2xl text-teal-600"></i>
-                    </div>
-                    <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Poli Gigi</h4>
-                    <p class="text-gray-600 dark:text-gray-300">Perawatan kesehatan gigi dan mulut dengan peralatan modern</p>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow" data-aos="fade-up" data-aos-delay="300">
-                    <div class="w-16 h-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-baby text-2xl text-teal-600"></i>
-                    </div>
-                    <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">KIA & KB</h4>
-                    <p class="text-gray-600 dark:text-gray-300">Kesehatan Ibu dan Anak serta program Keluarga Berencana</p>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow" data-aos="fade-up" data-aos-delay="400">
-                    <div class="w-16 h-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-syringe text-2xl text-teal-600"></i>
-                    </div>
-                    <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Imunisasi</h4>
-                    <p class="text-gray-600 dark:text-gray-300">Program imunisasi lengkap untuk bayi, anak, dan dewasa</p>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow" data-aos="fade-up" data-aos-delay="500">
-                    <div class="w-16 h-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-flask text-2xl text-teal-600"></i>
-                    </div>
-                    <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Laboratorium</h4>
-                    <p class="text-gray-600 dark:text-gray-300">Pemeriksaan laboratorium dengan hasil yang akurat dan cepat</p>
-                </div>
-                
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow" data-aos="fade-up" data-aos-delay="600">
-                    <div class="w-16 h-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mb-4">
-                        <i class="fas fa-bed text-2xl text-teal-600"></i>
-                    </div>
-                    <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-3">Rawat Jalan</h4>
-                    <p class="text-gray-600 dark:text-gray-300">Pelayanan rawat jalan dengan fasilitas yang nyaman</p>
-                </div>
+            <div class="text-center mt-3">
+                <small class="text-muted">Default: admin / 1234</small>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Jadwal Dokter Section -->
-    <section id="jadwal" class="py-16 bg-white dark:bg-gray-800 transition-colors duration-300">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Jadwal Dokter</h3>
-                <p class="text-lg text-gray-600 dark:text-gray-300">Jadwal praktik dokter di Puskesmas Ohoitahit</p>
-            </div>
-            
-            <div class="overflow-x-auto" data-aos="fade-up">
-                <table class="w-full bg-white dark:bg-gray-700 rounded-lg shadow-lg">
-                    <thead class="bg-teal-600 text-white">
-                        <tr>
-                            <th class="px-6 py-4 text-left">Nama Dokter</th>
-                            <th class="px-6 py-4 text-left">Spesialisasi</th>
-                            <th class="px-6 py-4 text-left">Hari</th>
-                            <th class="px-6 py-4 text-left">Jam Praktik</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 dark:divide-gray-600">
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-600">
-                            <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">dr. Ahmad Santoso</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">Dokter Umum</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">Senin - Jumat</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">08:00 - 14:00</td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-600">
-                            <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">dr. Sari Dewi</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">Dokter Gigi</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">Selasa, Kamis</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">09:00 - 15:00</td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-600">
-                            <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">dr. Maria Lestari</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">Dokter KIA</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">Senin, Rabu, Jumat</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">08:00 - 12:00</td>
-                        </tr>
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-600">
-                            <td class="px-6 py-4 text-gray-900 dark:text-white font-medium">dr. Budi Hartono</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">Dokter Umum</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">Sabtu</td>
-                            <td class="px-6 py-4 text-gray-600 dark:text-gray-300">08:00 - 12:00</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
-
-    <!-- Pendaftaran Online Section -->
-    <section id="daftar" class="py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Pendaftaran Online</h3>
-                <p class="text-lg text-gray-600 dark:text-gray-300">Daftar kunjungan Anda dengan mudah dan cepat</p>
-            </div>
-            
-            <div class="max-w-2xl mx-auto">
-                <form id="registrationForm" class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg" data-aos="fade-up">
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Nama Lengkap *</label>
-                            <input type="text" id="nama" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Umur *</label>
-                            <input type="number" id="umur" required min="1" max="120" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Jenis Kelamin *</label>
-                            <select id="jenisKelamin" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
-                                <option value="">Pilih Jenis Kelamin</option>
-                                <option value="Laki-laki">Laki-laki</option>
-                                <option value="Perempuan">Perempuan</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Layanan *</label>
-                            <select id="layanan" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
-                                <option value="">Pilih Layanan</option>
-                                <option value="Poli Umum">Poli Umum</option>
-                                <option value="Poli Gigi">Poli Gigi</option>
-                                <option value="KIA & KB">KIA & KB</option>
-                                <option value="Imunisasi">Imunisasi</option>
-                                <option value="Laboratorium">Laboratorium</option>
-                                <option value="Rawat Jalan">Rawat Jalan</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Tanggal Kunjungan *</label>
-                            <input type="date" id="tanggalKunjungan" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Keluhan (Opsional)</label>
-                            <textarea id="keluhan" rows="3" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent dark:bg-gray-700 dark:text-white" placeholder="Jelaskan keluhan Anda..."></textarea>
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="w-full mt-6 bg-teal-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-teal-700 transition-colors">
-                        <i class="fas fa-paper-plane mr-2"></i>Daftar Sekarang
-                    </button>
-                </form>
-                
-                <!-- Success Message -->
-                <div id="successMessage" class="hidden mt-6 p-4 bg-green-100 dark:bg-green-900 border border-green-400 text-green-700 dark:text-green-300 rounded-lg">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    Pendaftaran berhasil! Kami akan menghubungi Anda untuk konfirmasi jadwal.
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Kontak Section -->
-    <section id="kontak" class="py-16 bg-white dark:bg-gray-800 transition-colors duration-300">
-        <div class="container mx-auto px-4">
-            <div class="text-center mb-12" data-aos="fade-up">
-                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">Hubungi Kami</h3>
-                <p class="text-lg text-gray-600 dark:text-gray-300">Informasi kontak dan lokasi Puskesmas Ohoitahit</p>
-            </div>
-            
-            <div class="grid lg:grid-cols-2 gap-12">
-                <div data-aos="fade-right">
-                    <div class="space-y-6">
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-map-marker-alt text-teal-600"></i>
+    <!-- Main Application -->
+    <div id="mainApp" style="display: none;">
+        <!-- Header -->
+        <header class="main-header py-3">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-3">
+                        <div class="logo-section">
+                            <div class="logo-icon puskesmas-logo">
+                                <i class="fas fa-hospital"></i>
                             </div>
                             <div>
-                                <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Alamat</h4>
-                                <p class="text-gray-600 dark:text-gray-300">Jl. Kesehatan No. 123, Ohoitahit<br>Kecamatan Ohoitahit, Kabupaten Maluku Tenggara<br>Provinsi Maluku</p>
+                                <strong>Puskesmas</strong><br>
+                                <small class="text-muted">Ohoitahit</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h1 class="main-title">Puskesmas Ohoitahit</h1>
+                        <p class="text-center text-muted mb-0">Sistem Manajemen Data Pasien</p>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="logo-section justify-content-end">
+                            <div class="text-end">
+                                <strong>BPJS</strong><br>
+                                <small class="text-muted">Kesehatan</small>
+                            </div>
+                            <div class="logo-icon bpjs-logo">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-custom">
+            <div class="container">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#" onclick="showPage('dashboard')">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('dataPatients')">
+                                <i class="fas fa-users me-2"></i>Data Pasien
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="showPage('inputPatient')">
+                                <i class="fas fa-user-plus me-2"></i>Input Pasien
+                            </a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" onclick="logout()">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="container my-4">
+            <!-- Dashboard Page -->
+            <div id="dashboardPage" class="page-content fade-in">
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <div class="card card-custom stat-card">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="card-title text-muted">Total Pasien</h5>
+                                        <div class="stat-number" id="totalPatients">0</div>
+                                    </div>
+                                    <div class="text-primary">
+                                        <i class="fas fa-users fa-3x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card card-custom stat-card success">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="card-title text-muted">Pasien Hari Ini</h5>
+                                        <div class="stat-number success" id="todayPatients">0</div>
+                                    </div>
+                                    <div class="text-success">
+                                        <i class="fas fa-user-plus fa-3x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card card-custom">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Grafik Pasien Per Hari</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="patientsChart" height="100"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Patient Page -->
+            <div id="inputPatientPage" class="page-content" style="display: none;">
+                <div class="card card-custom">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-user-plus me-2"></i>Form Input Data Pasien</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="patientForm">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="hariTanggal" class="form-label">Hari/Tanggal *</label>
+                                    <input type="date" class="form-control form-control-custom" id="hariTanggal" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="namaPasien" class="form-label">Nama Pasien *</label>
+                                    <input type="text" class="form-control form-control-custom" id="namaPasien" placeholder="Masukkan nama lengkap" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="umur" class="form-label">Umur *</label>
+                                    <input type="number" class="form-control form-control-custom" id="umur" min="0" max="150" placeholder="Tahun" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="jenisKelamin" class="form-label">Jenis Kelamin *</label>
+                                    <select class="form-control form-control-custom" id="jenisKelamin" required>
+                                        <option value="">Pilih Jenis Kelamin</option>
+                                        <option value="Laki-laki">Laki-laki</option>
+                                        <option value="Perempuan">Perempuan</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="namaKK" class="form-label">Nama KK *</label>
+                                    <input type="text" class="form-control form-control-custom" id="namaKK" placeholder="Nama Kepala Keluarga" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="jumlah" class="form-label">Jumlah *</label>
+                                    <input type="number" class="form-control form-control-custom" id="jumlah" min="1" placeholder="Jumlah" required>
+                                </div>
+                                <div class="col-12 mb-3">
+                                    <label for="alamat" class="form-label">Alamat *</label>
+                                    <textarea class="form-control form-control-custom" id="alamat" rows="3" placeholder="Alamat lengkap" required></textarea>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="dx" class="form-label">DX (Diagnosis) *</label>
+                                    <input type="text" class="form-control form-control-custom" id="dx" placeholder="Diagnosis" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="terapi" class="form-label">Terapi *</label>
+                                    <input type="text" class="form-control form-control-custom" id="terapi" placeholder="Terapi yang diberikan" required>
+                                </div>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-success-custom">
+                                    <i class="fas fa-save me-2"></i>Simpan Data
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Patients Page -->
+            <div id="dataPatientsPage" class="page-content" style="display: none;">
+                <div class="card card-custom">
+                    <div class="card-header">
+                        <div class="row align-items-center">
+                            <div class="col-md-6">
+                                <h5 class="mb-0"><i class="fas fa-users me-2"></i>Data Pasien</h5>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button class="btn btn-success-custom" onclick="downloadExcel()">
+                                    <i class="fas fa-download me-2"></i>Download Excel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Search and Filter -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control form-control-custom" id="searchInput" placeholder="Cari nama pasien...">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-control form-control-custom" id="genderFilter">
+                                    <option value="">Semua Jenis Kelamin</option>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control form-control-custom" id="dateFilter">
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-primary-custom w-100" onclick="filterData()">
+                                    <i class="fas fa-search"></i> Filter
+                                </button>
                             </div>
                         </div>
                         
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-phone text-teal-600"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Telepon</h4>
-                                <p class="text-gray-600 dark:text-gray-300">(0916) 123-4567</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-envelope text-teal-600"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Email</h4>
-                                <p class="text-gray-600 dark:text-gray-300">info@puskesmasohoitahit.go.id</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fab fa-whatsapp text-teal-600"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900 dark:text-white mb-2">WhatsApp</h4>
-                                <a href="https://wa.me/6281234567890" class="text-teal-600 hover:text-teal-700">+62 812-3456-7890</a>
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-start space-x-4">
-                            <div class="w-12 h-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center flex-shrink-0">
-                                <i class="fas fa-clock text-teal-600"></i>
-                            </div>
-                            <div>
-                                <h4 class="font-semibold text-gray-900 dark:text-white mb-2">Jam Buka</h4>
-                                <p class="text-gray-600 dark:text-gray-300">
-                                    Senin - Jumat: 08:00 - 15:00<br>
-                                    Sabtu: 08:00 - 12:00<br>
-                                    Minggu: Tutup
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div data-aos="fade-left">
-                    <div class="bg-gray-200 dark:bg-gray-700 rounded-lg h-96 flex items-center justify-center">
-                        <div class="text-center">
-                            <i class="fas fa-map text-4xl text-gray-400 mb-4"></i>
-                            <p class="text-gray-600 dark:text-gray-400">Google Maps akan ditampilkan di sini</p>
-                            <p class="text-sm text-gray-500 dark:text-gray-500 mt-2">Koordinat: -5.6667, 132.7333</p>
+                        <!-- Data Table -->
+                        <div class="table-responsive">
+                            <table class="table table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Tanggal</th>
+                                        <th>Nama Pasien</th>
+                                        <th>Umur</th>
+                                        <th>Jenis Kelamin</th>
+                                        <th>Nama KK</th>
+                                        <th>Alamat</th>
+                                        <th>DX</th>
+                                        <th>Terapi</th>
+                                        <th>Jumlah</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="patientsTableBody">
+                                    <!-- Data will be populated here -->
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </main>
 
-    <!-- Admin Login Section (Hidden by default) -->
-    <section id="admin" class="hidden py-16 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-        <div class="container mx-auto px-4">
-            <div class="max-w-md mx-auto">
-                <div class="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg">
-                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Login Admin</h3>
-                    <form id="adminLoginForm">
-                        <div class="mb-4">
-                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Username</label>
-                            <input type="text" id="adminUsername" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
+        <!-- Footer -->
+        <footer class="footer-custom py-4">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5><i class="fas fa-hospital me-2"></i>Puskesmas Ohoitahit</h5>
+                        <p class="mb-1"><i class="fas fa-map-marker-alt me-2"></i>Jl. Kesehatan No. 123, Ohoitahit</p>
+                        <p class="mb-1"><i class="fas fa-phone me-2"></i>Telp: (0123) 456-7890</p>
+                        <p class="mb-0"><i class="fas fa-envelope me-2"></i>Email: info@puskesmasohoitahit.go.id</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-1">Sistem Manajemen Data Pasien</p>
+                        <p class="mb-0">&copy; 2024 Puskesmas Ohoitahit. All rights reserved.</p>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Edit Data Pasien</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editForm">
+                        <input type="hidden" id="editIndex">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Hari/Tanggal *</label>
+                                <input type="date" class="form-control form-control-custom" id="editHariTanggal" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nama Pasien *</label>
+                                <input type="text" class="form-control form-control-custom" id="editNamaPasien" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Umur *</label>
+                                <input type="number" class="form-control form-control-custom" id="editUmur" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Jenis Kelamin *</label>
+                                <select class="form-control form-control-custom" id="editJenisKelamin" required>
+                                    <option value="Laki-laki">Laki-laki</option>
+                                    <option value="Perempuan">Perempuan</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nama KK *</label>
+                                <input type="text" class="form-control form-control-custom" id="editNamaKK" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Jumlah *</label>
+                                <input type="number" class="form-control form-control-custom" id="editJumlah" required>
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label class="form-label">Alamat *</label>
+                                <textarea class="form-control form-control-custom" id="editAlamat" rows="3" required></textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">DX *</label>
+                                <input type="text" class="form-control form-control-custom" id="editDx" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Terapi *</label>
+                                <input type="text" class="form-control form-control-custom" id="editTerapi" required>
+                            </div>
                         </div>
-                        <div class="mb-6">
-                            <label class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Password</label>
-                            <input type="password" id="adminPassword" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent dark:bg-gray-700 dark:text-white">
-                        </div>
-                        <button type="submit" class="w-full bg-teal-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-teal-700 transition-colors">
-                            Login
-                        </button>
                     </form>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-success-custom" onclick="updatePatient()">
+                        <i class="fas fa-save me-2"></i>Update Data
+                    </button>
+                </div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-3 gap-8">
-                <div>
-                    <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-10 h-10 bg-teal-600 rounded-full flex items-center justify-center">
-                            <i class="fas fa-hospital text-white"></i>
-                        </div>
-                        <div>
-                            <h4 class="text-lg font-bold">Puskesmas Ohoitahit</h4>
-                            <p class="text-sm text-gray-400">Melayani dengan Hati</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-400">Memberikan pelayanan kesehatan terbaik untuk masyarakat dengan fasilitas modern dan tenaga medis profesional.</p>
-                </div>
-                
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Jam Pelayanan</h4>
-                    <div class="space-y-2 text-gray-400">
-                        <p>Senin - Jumat: 08:00 - 15:00</p>
-                        <p>Sabtu: 08:00 - 12:00</p>
-                        <p>Minggu: Tutup</p>
-                        <p class="text-red-400 mt-4">Gawat Darurat: 24 Jam</p>
-                    </div>
-                </div>
-                
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Media Sosial</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center hover:bg-blue-500 transition-colors">
-                            <i class="fab fa-twitter"></i>
-                        </a>
-                        <a href="#" class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center hover:bg-pink-700 transition-colors">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="https://wa.me/6281234567890" class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center hover:bg-green-700 transition-colors">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2024 Puskesmas Ohoitahit. Semua hak dilindungi undang-undang.</p>
-            </div>
-        </div>
-    </footer>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Initialize AOS
-        AOS.init({
-            duration: 1000,
-            once: true
+        // Global Variables
+        let patients = JSON.parse(localStorage.getItem('patients')) || [];
+        let currentEditIndex = -1;
+        let patientsChart = null;
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set today's date as default
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('hariTanggal').value = today;
+            
+            // Check if user is logged in
+            if (localStorage.getItem('isLoggedIn') === 'true') {
+                showMainApp();
+            }
         });
 
-        // Dark Mode Toggle
-        const darkModeToggle = document.getElementById('darkModeToggle');
-        const html = document.documentElement;
+        // Login Functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === 'admin' && password === '1234') {
+                localStorage.setItem('isLoggedIn', 'true');
+                showMainApp();
+            } else {
+                alert('Username atau password salah!');
+            }
+        });
 
-        // Check for saved theme preference or default to light mode
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        if (currentTheme === 'dark') {
-            html.classList.add('dark');
+        // Show Main Application
+        function showMainApp() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            showPage('dashboard');
         }
 
-        darkModeToggle.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            const theme = html.classList.contains('dark') ? 'dark' : 'light';
-            localStorage.setItem('theme', theme);
-        });
+        // Logout Functionality
+        function logout() {
+            if (confirm('Apakah Anda yakin ingin logout?')) {
+                localStorage.removeItem('isLoggedIn');
+                document.getElementById('loginPage').style.display = 'flex';
+                document.getElementById('mainApp').style.display = 'none';
+            }
+        }
 
-        // Mobile Menu Toggle
-        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
-        const mobileMenu = document.getElementById('mobileMenu');
+        // Page Navigation
+        function showPage(pageName) {
+            // Hide all pages
+            const pages = document.querySelectorAll('.page-content');
+            pages.forEach(page => page.style.display = 'none');
+            
+            // Remove active class from all nav links
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => link.classList.remove('active'));
+            
+            // Show selected page
+            document.getElementById(pageName + 'Page').style.display = 'block';
+            
+            // Add active class to current nav link
+            event.target.classList.add('active');
+            
+            // Load page specific data
+            if (pageName === 'dashboard') {
+                loadDashboard();
+            } else if (pageName === 'dataPatients') {
+                loadPatientsTable();
+            }
+        }
 
-        mobileMenuToggle.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
+        // Load Dashboard Data
+        function loadDashboard() {
+            const totalPatients = patients.length;
+            const today = new Date().toISOString().split('T')[0];
+            const todayPatients = patients.filter(p => p.hariTanggal === today).length;
+            
+            document.getElementById('totalPatients').textContent = totalPatients;
+            document.getElementById('todayPatients').textContent = todayPatients;
+            
+            // Load Chart
+            loadPatientsChart();
+        }
 
-        // Smooth Scrolling for Navigation Links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                    // Close mobile menu if open
-                    mobileMenu.classList.add('hidden');
+        // Load Patients Chart
+        function loadPatientsChart() {
+            const ctx = document.getElementById('patientsChart').getContext('2d');
+            
+            // Destroy existing chart if exists
+            if (patientsChart) {
+                patientsChart.destroy();
+            }
+            
+            // Get last 7 days data
+            const last7Days = [];
+            const patientCounts = [];
+            
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateString = date.toISOString().split('T')[0];
+                const count = patients.filter(p => p.hariTanggal === dateString).length;
+                
+                last7Days.push(date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' }));
+                patientCounts.push(count);
+            }
+            
+            patientsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: last7Days,
+                    datasets: [{
+                        label: 'Jumlah Pasien',
+                        data: patientCounts,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
                 }
             });
-        });
+        }
 
-        // Registration Form
-        const registrationForm = document.getElementById('registrationForm');
-        const successMessage = document.getElementById('successMessage');
-
-        // Set minimum date to today
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('tanggalKunjungan').setAttribute('min', today);
-
-        registrationForm.addEventListener('submit', function(e) {
+        // Patient Form Submission
+        document.getElementById('patientForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            // Get form data
-            const formData = {
-                nama: document.getElementById('nama').value,
+            const patientData = {
+                id: Date.now(),
+                hariTanggal: document.getElementById('hariTanggal').value,
+                namaPasien: document.getElementById('namaPasien').value,
                 umur: document.getElementById('umur').value,
                 jenisKelamin: document.getElementById('jenisKelamin').value,
-                layanan: document.getElementById('layanan').value,
-                tanggalKunjungan: document.getElementById('tanggalKunjungan').value,
-                keluhan: document.getElementById('keluhan').value,
-                timestamp: new Date().toISOString()
+                namaKK: document.getElementById('namaKK').value,
+                alamat: document.getElementById('alamat').value,
+                dx: document.getElementById('dx').value,
+                terapi: document.getElementById('terapi').value,
+                jumlah: document.getElementById('jumlah').value,
+                createdAt: new Date().toISOString()
             };
+            
+            patients.push(patientData);
+            localStorage.setItem('patients', JSON.stringify(patients));
+            
+            // Show success message
+            alert('Data pasien berhasil disimpan!');
+            
+            // Reset form
+            document.getElementById('patientForm').reset();
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('hariTanggal').value = today;
+        });
 
-            // Validate required fields
-            if (!formData.nama || !formData.umur || !formData.jenisKelamin || !formData.layanan || !formData.tanggalKunjungan) {
-                alert('Mohon lengkapi semua field yang wajib diisi!');
+        // Load Patients Table
+        function loadPatientsTable() {
+            const tbody = document.getElementById('patientsTableBody');
+            tbody.innerHTML = '';
+            
+            if (patients.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="text-center">Belum ada data pasien</td></tr>';
                 return;
             }
-
-            // Save to localStorage
-            let registrations = JSON.parse(localStorage.getItem('registrations') || '[]');
-            registrations.push(formData);
-            localStorage.setItem('registrations', JSON.stringify(registrations));
-
-            // Show success message
-            successMessage.classList.remove('hidden');
-            registrationForm.reset();
-
-            // Hide success message after 5 seconds
-            setTimeout(() => {
-                successMessage.classList.add('hidden');
-            }, 5000);
-
-            // Scroll to success message
-            successMessage.scrollIntoView({ behavior: 'smooth' });
-        });
-
-        // Admin Login (Demo)
-        const adminLoginForm = document.getElementById('adminLoginForm');
-        if (adminLoginForm) {
-            adminLoginForm.addEventListener('submit', function(e) {
-                e.preventDefault();
-                const username = document.getElementById('adminUsername').value;
-                const password = document.getElementById('adminPassword').value;
-                
-                if (username === 'admin' && password === 'admin123') {
-                    alert('Login berhasil! Dashboard admin akan ditampilkan.');
-                    // Here you would redirect to admin dashboard
-                } else {
-                    alert('Username atau password salah!');
-                }
-            });
-        }
-
-        // Show admin login (for demo purposes)
-        // You can add a secret key combination or hidden link
-        let keySequence = [];
-        document.addEventListener('keydown', function(e) {
-            keySequence.push(e.key);
-            if (keySequence.length > 5) keySequence.shift();
             
-            if (keySequence.join('') === 'admin') {
-                document.getElementById('admin').classList.remove('hidden');
-                document.getElementById('admin').scrollIntoView({ behavior: 'smooth' });
-                keySequence = [];
-            }
-        });
-
-        // PWA Service Worker Registration (Basic)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').then(function(registration) {
-                    console.log('ServiceWorker registration successful');
-                }, function(err) {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
+            patients.forEach((patient, index) => {
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${new Date(patient.hariTanggal).toLocaleDateString('id-ID')}</td>
+                        <td>${patient.namaPasien}</td>
+                        <td>${patient.umur} tahun</td>
+                        <td>${patient.jenisKelamin}</td>
+                        <td>${patient.namaKK}</td>
+                        <td>${patient.alamat}</td>
+                        <td>${patient.dx}</td>
+                        <td>${patient.terapi}</td>
+                        <td>${patient.jumlah}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary-custom me-1" onclick="editPatient(${index})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deletePatient(${index})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
             });
         }
+
+        // Filter Data
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const genderFilter = document.getElementById('genderFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            let filteredPatients = patients;
+            
+            // Filter by search term
+            if (searchTerm) {
+                filteredPatients = filteredPatients.filter(patient => 
+                    patient.namaPasien.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Filter by gender
+            if (genderFilter) {
+                filteredPatients = filteredPatients.filter(patient => 
+                    patient.jenisKelamin === genderFilter
+                );
+            }
+            
+            // Filter by date
+            if (dateFilter) {
+                filteredPatients = filteredPatients.filter(patient => 
+                    patient.hariTanggal === dateFilter
+                );
+            }
+            
+            // Update table with filtered data
+            const tbody = document.getElementById('patientsTableBody');
+            tbody.innerHTML = '';
+            
+            if (filteredPatients.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="text-center">Tidak ada data yang sesuai filter</td></tr>';
+                return;
+            }
+            
+            filteredPatients.forEach((patient, index) => {
+                const originalIndex = patients.indexOf(patient);
+                const row = `
+                    <tr>
+                        <td>${index + 1}</td>
+                        <td>${new Date(patient.hariTanggal).toLocaleDateString('id-ID')}</td>
+                        <td>${patient.namaPasien}</td>
+                        <td>${patient.umur} tahun</td>
+                        <td>${patient.jenisKelamin}</td>
+                        <td>${patient.namaKK}</td>
+                        <td>${patient.alamat}</td>
+                        <td>${patient.dx}</td>
+                        <td>${patient.terapi}</td>
+                        <td>${patient.jumlah}</td>
+                        <td>
+                            <button class="btn btn-sm btn-primary-custom me-1" onclick="editPatient(${originalIndex})">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="deletePatient(${originalIndex})">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        // Edit Patient
+        function editPatient(index) {
+            currentEditIndex = index;
+            const patient = patients[index];
+            
+            document.getElementById('editIndex').value = index;
+            document.getElementById('editHariTanggal').value = patient.hariTanggal;
+            document.getElementById('editNamaPasien').value = patient.namaPasien;
+            document.getElementById('editUmur').value = patient.umur;
+            document.getElementById('editJenisKelamin').value = patient.jenisKelamin;
+            document.getElementById('editNamaKK').value = patient.namaKK;
+            document.getElementById('editAlamat').value = patient.alamat;
+            document.getElementById('editDx').value = patient.dx;
+            document.getElementById('editTerapi').value = patient.terapi;
+            document.getElementById('editJumlah').value = patient.jumlah;
+            
+            const modal = new bootstrap.Modal(document.getElementById('editModal'));
+            modal.show();
+        }
+
+        // Update Patient
+        function updatePatient() {
+            const index = currentEditIndex;
+            
+            patients[index] = {
+                ...patients[index],
+                hariTanggal: document.getElementById('editHariTanggal').value,
+                namaPasien: document.getElementById('editNamaPasien').value,
+                umur: document.getElementById('editUmur').value,
+                jenisKelamin: document.getElementById('editJenisKelamin').value,
+                namaKK: document.getElementById('editNamaKK').value,
+                alamat: document.getElementById('editAlamat').value,
+                dx: document.getElementById('editDx').value,
+                terapi: document.getElementById('editTerapi').value,
+                jumlah: document.getElementById('editJumlah').value,
+                updatedAt: new Date().toISOString()
+            };
+            
+            localStorage.setItem('patients', JSON.stringify(patients));
+            
+            // Close modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('editModal'));
+            modal.hide();
+            
+            // Reload table
+            loadPatientsTable();
+            
+            alert('Data pasien berhasil diupdate!');
+        }
+
+        // Delete Patient
+        function deletePatient(index) {
+            if (confirm('Apakah Anda yakin ingin menghapus data pasien ini?')) {
+                patients.splice(index, 1);
+                localStorage.setItem('patients', JSON.stringify(patients));
+                loadPatientsTable();
+                alert('Data pasien berhasil dihapus!');
+            }
+        }
+
+        // Download Excel
+        function downloadExcel() {
+            if (patients.length === 0) {
+                alert('Tidak ada data untuk didownload!');
+                return;
+            }
+            
+            // Prepare data for Excel
+            const excelData = patients.map((patient, index) => ({
+                'No': index + 1,
+                'Tanggal': new Date(patient.hariTanggal).toLocaleDateString('id-ID'),
+                'Nama Pasien': patient.namaPasien,
+                'Umur': patient.umur + ' tahun',
+                'Jenis Kelamin': patient.jenisKelamin,
+                'Nama KK': patient.namaKK,
+                'Alamat': patient.alamat,
+                'Diagnosis (DX)': patient.dx,
+                'Terapi': patient.terapi,
+                'Jumlah': patient.jumlah,
+                'Puskesmas': 'Puskesmas Ohoitahit',
+                'Tanggal Export': new Date().toLocaleDateString('id-ID')
+            }));
+            
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            
+            // Set column widths
+            const colWidths = [
+                { wch: 5 },  // No
+                { wch: 15 }, // Tanggal
+                { wch: 25 }, // Nama Pasien
+                { wch: 12 }, // Umur
+                { wch: 15 }, // Jenis Kelamin
+                { wch: 25 }, // Nama KK
+                { wch: 40 }, // Alamat
+                { wch: 25 }, // Diagnosis
+                { wch: 25 }, // Terapi
+                { wch: 10 }, // Jumlah
+                { wch: 20 }, // Puskesmas
+                { wch: 20 }  // Tanggal Export
+            ];
+            ws['!cols'] = colWidths;
+            
+            // Add worksheet to workbook
+            XLSX.utils.book_append_sheet(wb, ws, 'Data Pasien');
+            
+            // Generate filename
+            const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            const filename = `data_pasien_ohoitahit_${timestamp}.xlsx`;
+            
+            // Download file
+            XLSX.writeFile(wb, filename);
+            
+            alert('File Excel berhasil didownload!');
+        }
+
+        // Real-time search
+        document.getElementById('searchInput').addEventListener('input', function() {
+            filterData();
+        });
+
+        // Auto-capitalize names
+        function capitalizeInput(inputId) {
+            document.getElementById(inputId).addEventListener('input', function(e) {
+                const words = e.target.value.split(' ');
+                const capitalizedWords = words.map(word => {
+                    if (word.length > 0) {
+                        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+                    }
+                    return word;
+                });
+                e.target.value = capitalizedWords.join(' ');
+            });
+        }
+
+        // Apply auto-capitalization
+        capitalizeInput('namaPasien');
+        capitalizeInput('namaKK');
+        capitalizeInput('editNamaPasien');
+        capitalizeInput('editNamaKK');
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96b4f68ad3cc89bf',t:'MTc1NDU1MDcxOS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
-</html>
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Form Pendaftaran Pasien</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-</head>
-<body class="bg-light">
-
-<div class="container mt-4">
-    <h2 class="text-center mb-4">Form Pendaftaran Pasien</h2>
-    <form id="pendaftaranForm">
-        <div class="mb-3">
-            <label class="form-label">Hari/Tanggal</label>
-            <input type="date" id="hariTanggal" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Nama Pasien</label>
-            <input type="text" id="namaPasien" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Umur</label>
-            <input type="number" id="umur" class="form-control" required>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Jenis Kelamin</label>
-            <select id="jenisKelamin" class="form-select" required>
-                <option value="">Pilih...</option>
-                <option value="Laki-laki">Laki-laki</option>
-                <option value="Perempuan">Perempuan</option>
-            </select>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Nama KK</label>
-            <input type="text" id="namaKK" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Alamat</label>
-            <textarea id="alamat" class="form-control"></textarea>
-        </div>
-        <div class="mb-3">
-            <label class="form-label">DX</label>
-            <input type="text" id="dx" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Terapi</label>
-            <input type="text" id="terapi" class="form-control">
-        </div>
-        <div class="mb-3">
-            <label class="form-label">Jumlah</label>
-            <input type="number" id="jumlah" class="form-control">
-        </div>
-        <button type="submit" class="btn btn-primary w-100">Daftar</button>
-    </form>
-</div>
-
-<script>
-document.getElementById("pendaftaranForm").addEventListener("submit", function(e) {
-    e.preventDefault();
-
-    const hariTanggal = document.getElementById("hariTanggal").value;
-    const namaPasien = document.getElementById("namaPasien").value;
-    const umur = document.getElementById("umur").value;
-    const jenisKelamin = document.getElementById("jenisKelamin").value;
-    const namaKK = document.getElementById("namaKK").value;
-    const alamat = document.getElementById("alamat").value;
-    const dx = document.getElementById("dx").value;
-    const terapi = document.getElementById("terapi").value;
-    const jumlah = document.getElementById("jumlah").value;
-
-    const data = [
-        ["Hari/Tanggal", "Nama Pasien", "Umur", "Jenis Kelamin", "Nama KK", "Alamat", "DX", "Terapi", "Jumlah"],
-        [hariTanggal, namaPasien, umur, jenisKelamin, namaKK, alamat, dx, terapi, jumlah]
-    ];
-
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(data);
-    XLSX.utils.book_append_sheet(wb, ws, "Data Pasien");
-    XLSX.writeFile(wb, "data_pasien.xlsx");
-
-    alert("Data berhasil disimpan ke Excel!");
-});
-</script>
-
-</body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96bb3f6506ff87a7',t:'MTc1NDYxNjYxOC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
